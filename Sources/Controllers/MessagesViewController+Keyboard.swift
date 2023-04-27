@@ -98,10 +98,6 @@ internal extension MessagesViewController {
         let newBottomInset = requiredScrollViewBottomInset(forKeyboardFrame: keyboardEndFrame)
         let differenceOfBottomInset = newBottomInset - messageCollectionViewBottomInset
 
-        UIView.performWithoutAnimation {
-            messageCollectionViewBottomInset = newBottomInset
-        }
-        
         if maintainPositionOnKeyboardFrameChanged && differenceOfBottomInset != 0 {
             let contentOffset = CGPoint(x: messagesCollectionView.contentOffset.x, y: messagesCollectionView.contentOffset.y + differenceOfBottomInset)
             // Changing contentOffset to bigger number than the contentSize will result in a jump of content
@@ -110,6 +106,12 @@ internal extension MessagesViewController {
                 return
             }
             messagesCollectionView.setContentOffset(contentOffset, animated: false)
+        }
+
+        // Change inset setting timing to after changing contentOffset
+        // Workaround for an issue where the scroll position changes when the keyboard is closed
+        UIView.performWithoutAnimation {
+            messageCollectionViewBottomInset = newBottomInset
         }
     }
 
